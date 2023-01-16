@@ -28,11 +28,39 @@ Here are some examples of how to use the API:
 
 Ruby Example:
 
-```
+```ruby
     HTTParty.get('http://elliotfayman.pythonanywhere.com/predict?token=tokenKey&image=https://th.bing.com/th/id/R.5c487ffb0b1b3e854764a1e9bfd43ff2?rik=NAgVDCH4nrhSzg&pid=ImgRaw&r=0')
 
 ```
 
+Python Example:
+
+```python
+    requests.get('http://elliotfayman.pythonanywhere.com/predict?token=tokenKey&image=https://th.bing.com/th/id/R.5c487ffb0b1b3e854764a1e9bfd43ff2?rik=NAgVDCH4nrhSzg&pid=ImgRaw&r=0')
+
+```
+
+JavaScript Example
+```javascript
+    fetch('http://elliotfayman.pythonanywhere.com/predict')
+  .then(response => {
+    if (response.ok) {
+      // Successful GET request
+      return response.json();
+    } else {
+      // Unsuccessful GET request
+      throw new Error(`Error: ${response.status}`);
+    }
+  })
+  .then(data => {
+    console.log(data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+
+
+```
 
 ## Error handling
 
