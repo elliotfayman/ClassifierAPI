@@ -1,6 +1,10 @@
-#Predict API
+# Predict API
 
-Welcome to the documentation for the Predict API. This API allows you to predict the food item in a particular photo. Here is the api url: http://elliotfayman.pythonanywhere.com/
+
+Welcome to the documentation for the Predict API. This API allows you to predict the food item in a particular photo.
+
+
+http://elliotfayman.pythonanywhere.com/
 
 ## Endpoints
 
