@@ -34,6 +34,7 @@ def index():
     return markdown.markdown(readme_file.read(), extensions=["fenced_code"])
 
 @app.route('/getFoods')
+@token_required
 def getFoods():
     return jsonify({'message' : f'{ML.getHash()}'})
 
