@@ -1,4 +1,4 @@
-# Predict API
+# Classifier API
 
 
 Welcome to the documentation for the Predict API. This API allows you to predict the food item in a particular photo.
