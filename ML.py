@@ -1,15 +1,14 @@
 import os
-os.add_dll_directory(r"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin")
 import warnings
-import numpy as np 
-import pandas as pd 
+import numpy as np
+import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import cv2
 import skimage
 import requests
 import urllib.request
-warnings.filterwarnings("ignore")
+
 
 import tensorflow as tf
 import tensorflow.keras.backend as K
@@ -18,7 +17,7 @@ from tensorflow.keras import models
 from tensorflow.keras.models import load_model
 from tensorflow.keras import models
 from mpl_toolkits.mplot3d import Axes3D
-from PIL import Image 
+from PIL import Image
 from skimage.io import imread
 from sklearn import cluster
 from skimage.feature import greycomatrix, greycoprops
@@ -37,13 +36,26 @@ from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(gpus[0], True)
 
-def fix_gpu():
-    config = ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = InteractiveSession(config=config)
+
+
+HASH = {0: ['apple_pie'], 1: ['baby_back_ribs'], 2: ['baklava'], 3: ['beef_carpaccio'], 4: ['beef_tartare'], 5: ['beet_salad'],
+6: ['beignets'], 7: ['bibimbap'], 8: ['bread_pudding'], 9: ['breakfast_burrito'], 10: ['bruschetta'], 11: ['caesar_salad'],
+12: ['cannoli'], 13: ['caprese_salad'], 14: ['carrot_cake'], 15: ['ceviche'], 16: ['cheese_plate'], 17: ['cheesecake'],
+18: ['chicken_curry'], 19: ['chicken_quesadilla'], 20: ['chicken_wings'], 21: ['chocolate_cake'], 22: ['chocolate_mousse'],
+23: ['churros'], 24: ['clam_chowder'], 25: ['club_sandwich'], 26: ['crab_cakes'], 27: ['creme_brulee'], 28: ['croque_madame'],
+29: ['cup_cakes'], 30: ['deviled_eggs'], 31: ['donuts'], 32: ['dumplings'], 33: ['edamame'], 34: ['eggs_benedict'], 35: ['escargots'],
+36: ['falafel'], 37: ['filet_mignon'], 38: ['fish_and_chips'], 39: ['foie_gras'], 40: ['french_fries'], 41: ['french_onion_soup'],
+42: ['french_toast'], 43: ['fried_calamari'], 44: ['fried_rice'], 45: ['frozen_yogurt'], 46: ['garlic_bread'], 47: ['gnocchi'],
+48: ['greek_salad'], 49: ['grilled_cheese_sandwich'], 50: ['grilled_salmon'], 51: ['guacamole'], 52: ['gyoza'], 53: ['hamburger'],
+54: ['hot_and_sour_soup'], 55: ['hot_dog'], 56: ['huevos_rancheros'], 57: ['hummus'], 58: ['ice_cream'], 59: ['lasagna'],
+60: ['lobster_bisque'], 61: ['lobster_roll_sandwich'], 62: ['macaroni_and_cheese'], 63: ['macarons'], 64: ['miso_soup'], 65: ['mussels'],
+66: ['nachos'], 67: ['omelette'], 68: ['onion_rings'], 69: ['oysters'], 70: ['pad_thai'], 71: ['paella'], 72: ['pancakes'],
+73: ['panna_cotta'], 74: ['peking_duck'], 75: ['pho'], 76: ['pizza'], 77: ['pork_chop'], 78: ['poutine'], 79: ['prime_rib'],
+80: ['pulled_pork_sandwich'], 81: ['ramen'], 82: ['ravioli'], 83: ['red_velvet_cake'], 84: ['risotto'], 85: ['samosa'], 86: ['sashimi'],
+87: ['scallops'], 88: ['seaweed_salad'], 89: ['shrimp_and_grits'], 90: ['spaghetti_bolognese'], 91: ['spaghetti_carbonara'],
+92: ['spring_rolls'], 93: ['steak'], 94: ['strawberry_shortcake'], 95: ['sushi'], 96: ['tacos'], 97: ['takoyaki'],
+98: ['tiramisu'], 99: ['tuna_tartare'], 100: ['waffles']}
 
 def predict_image(filename,model):
     try:
@@ -53,18 +65,18 @@ def predict_image(filename,model):
                 with open('temp.jpg', 'wb') as f:
                     f.write(url.read())
                 filename = 'temp.jpg'
-		
+
         else:
             raise requests.exceptions.RequestException
     except requests.exceptions.RequestException as e:
-        print("Invalid URL")
-    
+        return "Image URL invalid"
+
     img_ = image.load_img(filename, target_size=(299, 299))
-    
+
     img_array = image.img_to_array(img_)
-    img_processed = np.expand_dims(img_array, axis=0) 
-    img_processed /= 255.   
-        
+    img_processed = np.expand_dims(img_array, axis=0)
+    img_processed /= 255.
+
     prediction = model.predict(img_processed)
     #Delete temp.jpg if it exists
     if os.path.exists('temp.jpg'):
@@ -72,12 +84,11 @@ def predict_image(filename,model):
     return np.argmax(prediction)
 
 def main(image_url):
-    fix_gpu()
 
     K.clear_session()
 
 
-    model = load_model('model_v1_inceptionV3.h5')
+    model = load_model('/home/elliotfayman/mysite/model_v1_inceptionV3.h5')
 
     train_datagen = ImageDataGenerator(
         rescale=1. / 255,
@@ -85,27 +96,6 @@ def main(image_url):
         zoom_range=0.2,
         horizontal_flip=True)
 
-    train_generator = train_datagen.flow_from_directory(
-        'images',
-        target_size=(299, 299),
-        batch_size=5000,
-        class_mode='categorical')
-
-    class_map = train_generator.class_indices
-
-    return predict_image(image_url, model)
-
-#{'apple_pie': 0, 'baby_back_ribs': 1, 'baklava': 2, 'beef_carpaccio': 3, 'beef_tartare': 4, 'beet_salad': 5, 'beignets': 6, 
-#'bibimbap': 7, 'bread_pudding': 8, 'breakfast_burrito': 9, 'bruschetta': 10, 'caesar_salad': 11, 'cannoli': 12, 'caprese_salad': 13, 
-#'carrot_cake': 14, 'ceviche': 15, 'cheese_plate': 16, 'cheesecake': 17, 'chicken_curry': 18, 'chicken_quesadilla': 19, 'chicken_wings': 20, 
-#'chocolate_cake': 21, 'chocolate_mousse': 22, 'churros': 23, 'clam_chowder': 24, 'club_sandwich': 25, 'crab_cakes': 26, 'creme_brulee': 27, 
-#'croque_madame': 28, 'cup_cakes': 29, 'deviled_eggs': 30, 'donuts': 31, 'dumplings': 32, 'edamame': 33, 'eggs_benedict': 34, 'escargots': 35, 
-#'falafel': 36, 'filet_mignon': 37, 'fish_and_chips': 38, 'foie_gras': 39, 'french_fries': 40, 'french_onion_soup': 41, 'french_toast': 42, 
-#'fried_calamari': 43, 'fried_rice': 44, 'frozen_yogurt': 45, 'garlic_bread': 46, 'gnocchi': 47, 'greek_salad': 48, 'grilled_cheese_sandwich': 49, 
-#'grilled_salmon': 50, 'guacamole': 51, 'gyoza': 52, 'hamburger': 53, 'hot_and_sour_soup': 54, 'hot_dog': 55, 'huevos_rancheros': 56, 'hummus': 57, 
-#'ice_cream': 58, 'lasagna': 59, 'lobster_bisque': 60, 'lobster_roll_sandwich': 61, 'macaroni_and_cheese': 62, 'macarons': 63, 'miso_soup': 64, 
-#'mussels': 65, 'nachos': 66, 'omelette': 67, 'onion_rings': 68, 'oysters': 69, 'pad_thai': 70, 'paella': 71, 'pancakes': 72, 'panna_cotta': 73, 
-#'peking_duck': 74, 'pho': 75, 'pizza': 76, 'pork_chop': 77, 'poutine': 78, 'prime_rib': 79, 'pulled_pork_sandwich': 80, 'ramen': 81, 'ravioli': 82,
-# 'red_velvet_cake': 83, 'risotto': 84, 'samosa': 85, 'sashimi': 86, 'scallops': 87, 'seaweed_salad': 88, 'shrimp_and_grits': 89, 
-# 'spaghetti_bolognese': 90, 'spaghetti_carbonara': 91, 'spring_rolls': 92, 'steak': 93, 'strawberry_shortcake': 94, 'sushi': 95, 
-# 'tacos': 96, 'takoyaki': 97, 'tiramisu': 98, 'tuna_tartare': 99, 'waffles': 100}
+    return HASH[predict_image(image_url, model)][0]
+def getHash():
+    return HASH

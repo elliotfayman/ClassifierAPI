@@ -4,6 +4,7 @@ import jwt
 import functools
 import datetime
 import ML
+import markdown.extensions.fenced_code
 
 # Import the framework
 from flask import Flask, g, jsonify, request, make_response
@@ -27,9 +28,17 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
+@app.route('/')
+def index():
+    readme_file = open('/home/elliotfayman/mysite/README.md', 'r')
+    return markdown.markdown(readme_file.read(), extensions=["fenced_code"])
+
+@app.route('/getFoods')
+def getFoods():
+    return jsonify({'message' : f'{ML.getHash()}'})
 
 
-@app.route('/preidct')
+@app.route('/predict')
 @token_required
 def preidct(*args, **kwargs):
     image = request.args.get('image')
@@ -52,6 +61,3 @@ def generate_key():
 
     return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
