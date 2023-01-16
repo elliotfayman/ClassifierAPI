@@ -12,6 +12,7 @@ The following endpoints are available:
 
 - `GET /generate_key`: Retrieve a valid api token for valid users.
     - Generate_Key endpoint requires user to enter a username and valid password.
+- `GET /getFoods`: Retrieve a hash containing possible food items that can be selected.
 - `GET /predict`: Predicts food item in image and returns result as JSON object.
     - Predict endpoint has two paramaters, token and image.
     - Enter the token generated using the `GET /generate_key` endpoint
